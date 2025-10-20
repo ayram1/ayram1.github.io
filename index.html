@@ -1,4 +1,4 @@
-<html lang="es"><head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inventario de Karaoke Ordenado</title>
@@ -10,6 +10,7 @@
 <style>
 /* Estilos generales */
 body {
+    /* Mantenemos tus estilos */
     font-family: 'Poiret One', cursive, sans-serif;
     background-color: #f7f7f7;
     color: #333;
@@ -17,12 +18,31 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* Nuevo: asegurar que el cuerpo ocupe toda la altura visible */
+    min-height: 100vh;
+    /* Nuevo: tamaño base de la fuente (por defecto para escritorio) */
+    font-size: 16px;
+}
+
+/* Media Query para mejorar la lectura en móviles */
+@media (max-width: 640px) {
+    /* Aumentar el tamaño base de la fuente para mejor legibilidad en pantallas pequeñas */
+    body {
+        font-size: 18px; /* Un tamaño más grande para lectura en móvil */
+    }
+    /* Reducir el padding en pantallas muy estrechas */
+    body {
+        padding: 10px;
+    }
 }
 
 h1 {
     color: #1a202c; 
     margin-bottom: 20px;
     font-family: var(--font-primary);
+    /* Nuevo: Ajuste para que no se corte en el móvil */
+    max-width: 90%; 
+    text-align: center;
 }
 
 /* Estilo para las carpetas (títulos) */
@@ -94,21 +114,22 @@ li:hover:not(.folder) {
 
 /* Estilo para el contenedor principal */
 #arbol {
-	max-width: 400px;
-    width: 400px;
+    /* CORRECCIÓN: Usar anchos flexibles para móvil */
+    max-width: 450px;
+    width: 95%; /* Ocupa el 95% del ancho disponible */
     background: white;
-	overflow-x: hidden;
+    overflow-x: hidden;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-	
 }
 
 /* Estilo para la barra de búsqueda */
 /* Estilos para el Buscador */
 .search-container {
-    width: 100%;
-    max-width: 600px; /* Misma anchura que tu lista, si quieres */
+    /* Nuevo: Ajuste para que no se corte en el móvil */
+    width: 95%; 
+    max-width: 450px; /* Misma anchura que el árbol */
     margin-bottom: 20px;
 }
 
@@ -117,7 +138,8 @@ li:hover:not(.folder) {
     padding: 10px 15px;
     border: 2px solid #ccc;
     border-radius: 8px;
-    font-size: 16px;
+    /* Nuevo: Usar 'inherit' para heredar el tamaño del body (que ajustamos en el media query) */
+    font-size: inherit; 
     font-family: 'Roboto', sans-serif;
     color: #333;
     outline: none;
@@ -9832,7 +9854,7 @@ li:hover:not(.folder) {
                                             <span title="Fecha de modificación: 26/11/2012">Señora</span>
                                           </li><li class="file" data-name="si no piensas cambiar" style="display: block;">
                                             <span title="Fecha de modificación: 25/7/2023">Si no piensas cambiar</span>
-                                          </li><li class="file" data-name="si no te hu0bieras ido" style="display: block;">
+                                          </li><li class="file" data-name="si no te hubieras ido" style="display: block;">
                                             <span title="Fecha de modificación: 25/1/2010">Si no te hubieras ido</span>
                                           </li><li class="file" data-name="sin llorar" style="display: block;">
                                             <span title="Fecha de modificación: 1/3/2024">Sin Llorar</span>
