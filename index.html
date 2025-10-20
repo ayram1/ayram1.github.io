@@ -1,4 +1,4 @@
-<html lang="en"><head>
+<html lang="es"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inventario de Karaoke Ordenado</title>
@@ -20,9 +20,7 @@ body {
 }
 
 h1 {
-    color: #1a202c;
-	width: 100%; 
-    text-align: center;
+    color: #1a202c; 
     margin-bottom: 20px;
     font-family: var(--font-primary);
 }
@@ -96,8 +94,8 @@ li:hover:not(.folder) {
 
 /* Estilo para el contenedor principal */
 #arbol {
-	max-width: 370px;
-    width: 370px;
+	max-width: 400px;
+    width: 400px;
     background: white;
 	overflow-x: hidden;
     padding: 20px;
@@ -114,7 +112,7 @@ li:hover:not(.folder) {
     margin-bottom: 20px;
 }
 
-#searchInput {
+#filtro {
     width: 100%;
     padding: 10px 15px;
     border: 2px solid #ccc;
@@ -126,7 +124,7 @@ li:hover:not(.folder) {
     transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-#searchInput:focus {
+#filtro:focus {
     border-color: #1a202c; /* Color de tus carpetas */
     box-shadow: 0 0 5px rgba(26, 32, 44, 0.5);
 }
@@ -155,7 +153,7 @@ li:hover:not(.folder) {
 
         <!-- BARRA DE BÚSQUEDA -->
         <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Buscar artista o canción..." onkeyup="filterList()">
+    <input type="text" id="filtro" placeholder="Buscar artista o canción...">
 </div>
 
         <div id="arbol"><ul><li class="folder font-bold" data-name="3 Doors Down" style="display: block;">► 3 Doors Down</li><ul  class=""><ul><li class="file" data-name="here without you(acoustic)" style="display: block;">
@@ -9834,7 +9832,7 @@ li:hover:not(.folder) {
                                             <span title="Fecha de modificación: 26/11/2012">Señora</span>
                                           </li><li class="file" data-name="si no piensas cambiar" style="display: block;">
                                             <span title="Fecha de modificación: 25/7/2023">Si no piensas cambiar</span>
-                                          </li><li class="file" data-name="si no te hubieras ido" style="display: block;">
+                                          </li><li class="file" data-name="si no te hu0bieras ido" style="display: block;">
                                             <span title="Fecha de modificación: 25/1/2010">Si no te hubieras ido</span>
                                           </li><li class="file" data-name="sin llorar" style="display: block;">
                                             <span title="Fecha de modificación: 1/3/2024">Sin Llorar</span>
@@ -10163,154 +10161,200 @@ li:hover:not(.folder) {
     </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Selecciona todos los elementos con la clase 'folder' (tus títulos)
-        const folders = document.querySelectorAll('.folder');
+// Espera a que el DOM esté completamente cargado antes de ejecutar el código
+document.addEventListener('DOMContentLoaded', () => {
 
-        folders.forEach(folder => {
-            // Asigna la función de clic a cada carpeta
-            folder.addEventListener('click', () => {
-                // Selecciona el <ul> adyacente (la lista de archivos)
-                const targetUl = folder.nextElementSibling;
+    // 1. Configuración del Evento de Clic para el Despliegue (Usando tu lógica original)
+    // =================================================================================
+    const folders = document.querySelectorAll('.folder');
+
+    folders.forEach(folder => {
+        // Asigna la función de clic a cada carpeta
+        folder.addEventListener('click', () => {
+            // Selecciona el <ul> adyacente (la lista de archivos)
+            const targetUl = folder.nextElementSibling;
+            
+            // CRUCIAL: Limpiamos los estilos que pudo dejar la búsqueda antes de operar
+            // Aunque ya se hace en filterList, lo mantenemos como capa de seguridad
+            targetUl.style.removeProperty('opacity');
+            targetUl.style.removeProperty('display');
+            targetUl.classList.remove('expanded'); 
+            
+            // Aseguramos que la transición esté activa antes de cualquier acción de altura
+            targetUl.style.transition = 'height 0.5s ease-in-out, opacity 0.3s ease-in-out';
+
+            // Si la lista está actualmente colapsada (height: 0 o '')
+            if (targetUl.style.height === '0px' || targetUl.style.height === '') {
                 
-                // Si la lista está actualmente colapsada (height: 0)
-                if (targetUl.style.height === '0px' || targetUl.style.height === '') {
-                    // 1. Quita el height actual para que el navegador calcule la altura real ('scrollHeight')
-                    targetUl.style.height = 'auto';
-                    // 2. Obtiene la altura real del contenido.
-                    const finalHeight = targetUl.scrollHeight;
-                    // 3. Vuelve a establecer la altura a 0 para preparar la transición
+                // 1. Quita el height actual para que el navegador calcule la altura real ('scrollHeight')
+                targetUl.style.height = 'auto';
+                
+                // Forzar un reflow para asegurar el cálculo
+                targetUl.offsetHeight; 
+
+                // 2. Obtiene la altura real del contenido.
+                const finalHeight = targetUl.scrollHeight;
+                
+                // 3. Vuelve a establecer la altura a 0 para preparar la transición
+                targetUl.style.height = '0px';
+                
+                // Asegura que la transición se aplique después del cálculo
+                setTimeout(() => {
+                    // 4. Establece la altura final (con transición de 0.5s)
+                    targetUl.style.height = `${finalHeight}px`;
+                    // 5. Agrega la clase 'expanded' para el opacity: 1
+                    targetUl.classList.add('expanded');
+                    
+                    // Opcional: Cambiar el icono de la carpeta
+                    folder.innerHTML = '▼ ' + folder.getAttribute('data-name');
+                }, 5);
+
+            } else {
+                // Si la lista está expandida, la colapsa con transición
+                
+                // 1. Establece la altura actual para poder hacer la transición a 0
+                targetUl.style.height = targetUl.scrollHeight + 'px';
+
+                // Asegura que la transición se aplique antes de establecer la altura a 0
+                setTimeout(() => {
+                    // 2. Colapsa la lista
                     targetUl.style.height = '0px';
-                    
-                    // Asegura que la transición se aplique después del cálculo
-                    setTimeout(() => {
-                        // 4. Establece la altura final (con transición de 0.5s)
-                        targetUl.style.height = `${finalHeight}px`;
-                        // 5. Agrega la clase 'expanded' para el opacity: 1
-                        targetUl.classList.add('expanded');
-                        
-                        // Opcional: Cambiar el icono de la carpeta
-                        folder.innerHTML = '▼ ' + folder.getAttribute('data-name');
-                    }, 5);
+                    // 3. Remueve la clase 'expanded'
+                    targetUl.classList.remove('expanded');
 
-                } else {
-                    // Si la lista está expandida, la colapsa con transición
-                    
-                    // 1. Establece la altura actual para poder hacer la transición a 0
-                    targetUl.style.height = targetUl.scrollHeight + 'px';
+                    // Opcional: Cambiar el icono de la carpeta de vuelta
+                    folder.innerHTML = '► ' + folder.getAttribute('data-name');
+                }, 5);
+            }
+        });
+    });
 
-                    // Asegura que la transición se aplique antes de establecer la altura a 0
-                    setTimeout(() => {
-                        // 2. Colapsa la lista
-                        targetUl.style.height = '0px';
-                        // 3. Remueve la clase 'expanded'
-                        targetUl.classList.remove('expanded');
+    // 2. Configuración del Evento de Búsqueda
+    // =======================================
+    const filtroInput = document.getElementById('filtro');
+    
+    if (filtroInput) {
+        // Usamos 'input' en lugar de 'onkeyup'
+        filtroInput.addEventListener('input', (e) => {
+            filterList(e.target.value);
+        });
+    }
 
-                        // Opcional: Cambiar el icono de la carpeta de vuelta
-                        folder.innerHTML = '► ' + folder.getAttribute('data-name');
-                    }, 5);
+    // 3. Función de Filtrado Corregida (Revisamos tu filterList)
+    // ===========================================================
+    function filterList(inputValue) {
+        const filter = inputValue.toUpperCase().trim();
+        
+        // 1. Ocultar todos los elementos y contenedores por defecto
+        document.querySelectorAll('#arbol .folder + ul').forEach(ul => {
+            // Desactivar temporalmente la transición para evitar que colapse instantáneamente
+            ul.style.transition = 'none'; 
+            
+            // Al aplicar el filtro, forzamos que el UL contenedor se colapse y oculte inmediatamente
+            ul.style.height = '0px';
+            ul.style.opacity = '0';
+            ul.style.display = 'none';
+            ul.classList.remove('expanded');
+        });
+
+        // Ocultar todas las carpetas (LI) y archivos (LI)
+        document.querySelectorAll('#arbol .folder, #arbol .file').forEach(item => {
+            item.style.display = 'none';
+        });
+
+        // Si el filtro está vacío, restaurar solo las carpetas a visible y salir
+        if (filter === "") {
+            document.querySelectorAll('#arbol .folder').forEach(folder => {
+                folder.style.display = 'block';
+                // Asegurar que el icono esté en el estado colapsado
+                if (folder.getAttribute('data-name')) {
+                    folder.innerHTML = '► ' + folder.getAttribute('data-name');
                 }
             });
-        });
-    });
-	
-	function filterList() {
-    const input = document.getElementById('searchInput');
-    // Obtener el texto de búsqueda y limpiar espacios y mayúsculas/minúsculas
-    const filter = input.value.toUpperCase().trim();
-    
-    // 1. Ocultar todos los elementos y contenedores por defecto
-    // Seleccionamos todos los UL que siguen a un LI.folder, que son los contenedores de las sublistas
-    document.querySelectorAll('#arbol .folder + ul').forEach(ul => {
-        // Al aplicar el filtro, forzamos que el UL contenedor se colapse y oculte inmediatamente
-        ul.style.height = '0px'; 
-        ul.style.opacity = '0';
-        ul.style.display = 'none'; // Para ocultarlo inmediatamente (sin romper la animación)
-        ul.classList.remove('expanded');
-    });
-
-    // Ocultar todas las carpetas (LI) y archivos (LI)
-    document.querySelectorAll('#arbol .folder, #arbol .file').forEach(item => {
-        item.style.display = 'none';
-    });
-
-    // Si el filtro está vacío, restaurar solo las carpetas a visible y salir
-    if (filter === "") {
-        document.querySelectorAll('#arbol .folder').forEach(folder => {
-            folder.style.display = 'block';
-        });
-        return; 
-    }
-    
-    // 2. Iterar sobre todos los ARCHIVOS para encontrar coincidencias y mostrar a sus padres
-    document.querySelectorAll('#arbol .file').forEach(file => {
-        const name = file.getAttribute('data-name').toUpperCase();
-        
-        if (name.includes(filter)) {
-            // A. Mostrar el archivo (LI)
-            file.style.display = 'list-item';
             
-            // B. Encontrar el UL contenedor principal (el que sigue al LI.folder)
-            // Usamos closest() para subir a la estructura LI > UL > UL > LI.file
-            // Necesitamos subir al primer UL que NO es el LI.file padre.
-            
-            // Subimos al UL que sigue a la carpeta (es el que tiene el "height: 0")
-            const ulA = file.closest('.folder + ul'); 
-            
-            if (ulA) {
-                // Encontramos el LI .folder que es el hermano anterior
-                const folderLi = ulA.previousElementSibling;
+            // *** CORRECCIÓN CRUCIAL: Usamos el selector ".folder + ul" para solo limpiar el UL colapsable ***
+            document.querySelectorAll('#arbol .folder + ul').forEach(ul => {
+                ul.style.removeProperty('height');
+                ul.style.removeProperty('opacity');
+                ul.style.removeProperty('display');
+                ul.style.removeProperty('transition'); // Limpiamos la transición forzada
                 
-                if (folderLi && folderLi.classList.contains('folder')) {
-                    // Mostrar el LI .folder (título del artista)
-                    folderLi.style.display = 'block';
+                // Adicionalmente, aseguramos que los LI.file dentro de este UL vuelvan a "display: list-item" 
+                // para que el scrollHeight se calcule correctamente en el próximo click
+                ul.querySelectorAll('.file').forEach(file => {
+                     file.style.removeProperty('display'); 
+                });
+            });
+            return;
+        }
+        
+        // 2. Iterar sobre todos los ARCHIVOS para encontrar coincidencias y mostrar a sus padres
+        document.querySelectorAll('#arbol .file').forEach(file => {
+            const name = (file.getAttribute('data-name') || file.textContent).toUpperCase();
+            
+            if (name.includes(filter)) {
+                // A. Mostrar el archivo (LI)
+                file.style.display = 'list-item';
+                
+                // file.closest('.folder + ul') no funciona porque .closest solo busca ascendentes.
+                // Tu HTML es: LI.file -> UL -> UL.colapsable -> LI.folder
+                // Corregimos la subida buscando el UL padre y luego el abuelo
+                const ulInner = file.closest('ul');
+                const ulA = ulInner ? ulInner.closest('.folder + ul') : null; 
+                
+                if (ulA) {
+                    const folderLi = ulA.previousElementSibling;
                     
-                    // C. Mostrar el UL contenedor forzando su estado para el filtro
-                    // Usamos height: auto para que todos los archivos coincidan
-                    ulA.style.height = 'auto'; 
-                    ulA.style.opacity = '1';
-                    ulA.style.display = 'block'; 
-                    ulA.classList.add('expanded');
+                    if (folderLi && folderLi.classList.contains('folder')) {
+                        // Mostrar el LI .folder (título del artista)
+                        folderLi.style.display = 'block';
+                        // Asegurar que el icono esté expandido en la búsqueda
+                         if (folderLi.getAttribute('data-name')) {
+                            folderLi.innerHTML = '▼ ' + folderLi.getAttribute('data-name');
+                        }
+                        
+                        // C. Mostrar el UL contenedor forzando su estado para el filtro
+                        ulA.style.height = 'auto'; 
+                        ulA.style.opacity = '1';
+                        ulA.style.display = 'block'; 
+                        ulA.classList.add('expanded');
+                    }
                 }
             }
-        }
-    });
-
-    // 3. Iterar sobre las CARPETAS para encontrar coincidencias directas (y mostrar todo su contenido)
-    document.querySelectorAll('#arbol .folder').forEach(folder => {
-        const name = folder.getAttribute('data-name').toUpperCase();
-        
-        if (name.includes(filter)) {
-            // Mostrar la carpeta (LI)
-            folder.style.display = 'block';
-            
-            // Mostrar su UL contenedor (UL A)
-            const ulA = folder.nextElementSibling;
-            if (ulA && ulA.tagName === 'UL') {
-                
-                // Mostrar el UL contenedor forzando su estado
-                ulA.style.height = 'auto'; 
-                ulA.style.opacity = '1';
-                ulA.style.display = 'block';
-                ulA.classList.add('expanded');
-
-                // Mostrar todos los archivos dentro de esa carpeta
-                ulA.querySelectorAll('.file').forEach(file => {
-                    file.style.display = 'list-item';
-                });
-            }
-        }
-    });
-
-    // 4. Asegurar que la transición de altura se reactive al salir del filtro (para el clic)
-    setTimeout(() => {
-        document.querySelectorAll('#arbol .folder + ul').forEach(ul => {
-            ul.style.transition = 'height 0.5s ease-in-out, opacity 0.3s ease-in-out';
         });
-    }, 100); 
-}
+
+        // 3. Iterar sobre las CARPETAS para encontrar coincidencias directas (y mostrar todo su contenido)
+        document.querySelectorAll('#arbol .folder').forEach(folder => {
+            const name = (folder.getAttribute('data-name') || folder.textContent).toUpperCase();
+            
+            if (name.includes(filter)) {
+                // Mostrar la carpeta (LI)
+                folder.style.display = 'block';
+                 if (folder.getAttribute('data-name')) {
+                    folder.innerHTML = '▼ ' + folder.getAttribute('data-name');
+                }
+                
+                // Mostrar su UL contenedor (UL A)
+                const ulA = folder.nextElementSibling;
+                if (ulA && ulA.tagName === 'UL') {
+                    
+                    // Mostrar el UL contenedor forzando su estado
+                    ulA.style.height = 'auto'; 
+                    ulA.style.opacity = '1';
+                    ulA.style.display = 'block';
+                    ulA.classList.add('expanded');
+
+                    // Mostrar todos los archivos dentro de esa carpeta
+                    ulA.querySelectorAll('.file').forEach(file => {
+                        file.style.display = 'list-item';
+                    });
+                }
+            }
+        });
+    } // Fin de filterList
+    
+}); // Fin de DOMContentLoaded
+
 </script>
 
-
 </body></html>
-
